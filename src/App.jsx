@@ -1,6 +1,12 @@
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 
-import { AuthProvider } from "./lib/AuthContext";
+import { AuthProvider, useAuth } from "./lib/AuthContext";
 import ProtectedRoute from "./lib/ProtectedRoute";
 
 import DuelArena from "./pages/DuelArena";
@@ -9,13 +15,16 @@ import Lobby from "./pages/Lobby";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Problems from "./pages/Problems";
+import Result from "./pages/Result";
+import Layout from "./components/Layout";
+import Friends from "./pages/Friends";
 
-function ResultStub() {
-  const { state } = useLocation();
+function Root() {
+  const { session, loading } = useAuth();
 
-  return (
-    <pre className="p-6 text-ink-100">{JSON.stringify(state, null, 2)}</pre>
-  );
+  if (loading) return null;
+
+  return <Navigate to={session ? "/dashboard" : "/login"} />;
 }
 
 export default function App() {
@@ -24,18 +33,24 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route
-            path="/result/:matchId"
+            path="/duel/:matchId/result"
             element={
               <ProtectedRoute>
-                <ResultStub />
+                <Layout>
+                  <Result />
+                </Layout>
               </ProtectedRoute>
             }
           />
+          <Route path="/" element={<Root />} />
+
           <Route
-            path="/"
+            path="/dashboard"
             element={
               <ProtectedRoute>
-                <Lobby />
+                <Layout>
+                  <Lobby />
+                </Layout>
               </ProtectedRoute>
             }
           />
@@ -54,7 +69,20 @@ export default function App() {
             path="/problems"
             element={
               <ProtectedRoute>
-                <Problems />
+                <Layout>
+                  <Problems />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/friends"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Friends />
+                </Layout>
               </ProtectedRoute>
             }
           />

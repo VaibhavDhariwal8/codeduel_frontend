@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../lib/AuthContext";
 
+import Chip from "../components/ui/Chip";
+
 export default function Problems() {
   const { session } = useAuth();
   const [problems, setProblems] = useState([]);
@@ -30,7 +32,7 @@ export default function Problems() {
             <span>{p.title}</span>
 
             <span className="text-ink-400 text-sm uppercase">
-              {p.difficulty}
+              <Chip tone={p.difficulty}>{p.difficulty}</Chip>
             </span>
           </div>
         ))}

@@ -4,6 +4,9 @@ import { useAuth } from "../lib/AuthContext";
 import { getSocket } from "../lib/socket";
 import Editor from "@monaco-editor/react";
 
+import Button from "../components/ui/Button";
+import Chip from "../components/ui/Chip";
+
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 const DEFAULT_CODE = {
@@ -114,8 +117,7 @@ export default function DuelArena() {
       if (submitterId !== session.user.id)
         setOpponentProgress({ testsPassed, testsTotal });
     };
-    const onEnded = (payload) =>
-      navigate(`/result/${matchId}`, { state: payload });
+    const onEnded = (payload) => navigate(`/duel/${matchId}/result`);
 
     socket.on("duel:opponent:progress", onProgress);
     socket.on("match:ended", onEnded);
@@ -199,17 +201,16 @@ export default function DuelArena() {
           <span className="font-display text-lg font-semibold">
             {data.problem.title}
           </span>
-          <span className="font-mono text-xs uppercase px-2 py-0.5 rounded bg-base-800 text-ink-400 border border-base-700">
-            {data.problem.difficulty}
+          <span>
+            <Chip tone={data.problem.difficulty}>
+              {data.problem.difficulty}
+            </Chip>
           </span>
         </div>
         <Timer startedAt={data.match.started_at} />
-        <button
-          onClick={handleForfeit}
-          className="bg-verdict-fail text-base-950 px-4 py-1.5 rounded text-sm font-medium"
-        >
+        <Button variant="danger" onClick={handleForfeit}>
           Forfeit
-        </button>
+        </Button>
       </div>
 
       <PanelGroup
@@ -269,20 +270,17 @@ export default function DuelArena() {
                     <option value="cpp">C++</option>
                   </select>
                   <div className="flex gap-2">
-                    <button
-                      onClick={handleRun}
-                      disabled={running}
-                      className="bg-brand-500 px-4 py-1.5 rounded text-sm font-medium disabled:opacity-50"
-                    >
+                    <Button onClick={handleRun} disabled={running}>
                       {running ? "Running…" : "Run"}
-                    </button>
-                    <button
+                    </Button>
+
+                    <Button
+                      variant="secondary"
                       onClick={handleSubmit}
                       disabled={submitting}
-                      className="border border-base-700 px-4 py-1.5 rounded text-sm font-medium"
                     >
                       {submitting ? "Submitting…" : "Submit"}
-                    </button>
+                    </Button>
                   </div>
                 </div>
 

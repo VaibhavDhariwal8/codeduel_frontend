@@ -8,6 +8,7 @@ import {
   History,
   ChevronDown,
   LogOut,
+  History as HistoryIcon,
 } from "lucide-react";
 import Button from "./ui/Button";
 
@@ -53,13 +54,13 @@ export default function Layout({ children }) {
           Friends
         </Link>
 
-        <span
-          className="flex items-center gap-2 px-3 py-2 rounded-md text-sm text-ink-400 cursor-not-allowed"
-          title="Wired on Day 11"
+        <Link
+          to="/history"
+          className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-base-800 text-sm text-ink-100 transition-colors"
         >
-          <History size={16} />
+          <HistoryIcon size={16} />
           History
-        </span>
+        </Link>
 
         <div className="mt-auto relative">
           <button
@@ -75,16 +76,16 @@ export default function Layout({ children }) {
 
           {menuOpen && (
             <div className="absolute bottom-full mb-1 w-full bg-base-800 border border-base-700 rounded-md shadow-xl overflow-hidden">
-              <span
-                className="block px-3 py-2 text-sm text-ink-400 cursor-not-allowed"
-                title="Wired on Day 11"
+              <Link
+                to="/profile/me"
+                className="block px-3 py-2 text-sm text-ink-100 hover:bg-base-700 transition-colors"
               >
                 My Profile
-              </span>
+              </Link>
 
               <span
                 className="block px-3 py-2 text-sm text-ink-400 cursor-not-allowed"
-                title="Wired on Day 11"
+                title="Not built in this demo — out of scope for v1"
               >
                 Settings
               </span>

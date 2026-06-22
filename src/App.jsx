@@ -19,6 +19,9 @@ import Result from "./pages/Result";
 import Layout from "./components/Layout";
 import Friends from "./pages/Friends";
 
+import Profile from "./pages/Profile";
+import History from "./pages/History";
+
 function Root() {
   const { session, loading } = useAuth();
 
@@ -83,6 +86,24 @@ export default function App() {
                 <Layout>
                   <Friends />
                 </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/profile/:identifier"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/history"
+            element={
+              <ProtectedRoute>
+                <History />
               </ProtectedRoute>
             }
           />

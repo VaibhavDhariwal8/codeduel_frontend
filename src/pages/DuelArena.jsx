@@ -103,6 +103,8 @@ export default function DuelArena() {
   const [customOutput, setCustomOutput] = useState(null);
   const [customRunning, setCustomRunning] = useState(false);
 
+  const [pasteBlocked, setPasteBlocked] = useState(false);
+
   useEffect(() => {
     const socket = getSocket(session.access_token);
     socket.emit("duel:join", { matchId });
@@ -190,6 +192,30 @@ export default function DuelArena() {
     if (!confirm("Forfeit this match?")) return;
 
     getSocket(session.access_token).emit("duel:forfeit", { matchId });
+  }
+
+  function handleEditorMount(editor) {
+    console.log("EDITOR MOUNTED");
+
+    editor.onKeyDown((e) => {
+      const isPaste = (e.ctrlKey || e.metaKey) && e.keyCode === 52; // KeyMod.CtrlCmd + V
+
+      if (!isPaste) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      setPasteBlocked(true);
+
+      setTimeout(() => {
+        setPasteBlocked(false);
+      }, 2000);
+
+      getSocket(session.access_token).emit("anticheat:paste_attempt", {
+        matchId,
+        language,
+      });
+    });
   }
 
   if (!data) return <div className="p-6 text-ink-400">Loading match...</div>;
@@ -331,13 +357,18 @@ export default function DuelArena() {
                     )}
                   </div>
                 )}
-
+                {pasteBlocked && (
+                  <div className="px-4 py-1.5 bg-verdict-warn/10 border-b border-verdict-warn/30 text-verdict-warn text-xs">
+                    Paste is disabled during duels.
+                  </div>
+                )}
                 <div className="flex-1 min-h-0">
                   <Editor
                     height="100%"
                     theme="vs-dark"
                     language={language}
                     value={code}
+                    onMount={handleEditorMount}
                     onChange={setCode}
                     options={{
                       fontFamily: "JetBrains Mono",

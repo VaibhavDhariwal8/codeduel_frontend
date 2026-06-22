@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/AuthContext";
 import Button from "../components/ui/Button";
+import { getSocket } from "../lib/socket";
 
 function AnimatedDelta({ delta }) {
   const [display, setDisplay] = useState(0);
@@ -40,6 +41,7 @@ export default function Result() {
   const [reportReason, setReportReason] = useState("suspected_cheating");
   const [reportDetails, setReportDetails] = useState("");
   const [reporting, setReporting] = useState(false);
+  const [rematchState, setRematchState] = useState("idle");
 
   async function submitReport() {
     try {
@@ -66,6 +68,28 @@ export default function Result() {
     }
   }
 
+  function requestRematch() {
+    getSocket(session.access_token).emit("rematch:request", {
+      matchId,
+    });
+
+    setRematchState("requested");
+  }
+
+  function acceptRematch() {
+    getSocket(session.access_token).emit("rematch:accept", {
+      matchId,
+    });
+  }
+
+  function declineRematch() {
+    getSocket(session.access_token).emit("rematch:decline", {
+      matchId,
+    });
+
+    setRematchState("declined");
+  }
+
   useEffect(() => {
     let attempts = 0;
     function load() {
@@ -82,6 +106,46 @@ export default function Result() {
     }
     load();
   }, [matchId, session]);
+
+  useEffect(() => {
+    const socket = getSocket(session.access_token);
+
+    socket.emit("duel:join", {
+      matchId,
+    });
+  }, [matchId, session]);
+
+  useEffect(() => {
+    const socket = getSocket(session.access_token);
+
+    const onRematchRequested = ({ fromUserId }) => {
+      console.log("REMATCH REQUEST RECEIVED", fromUserId);
+
+      if (fromUserId !== session.user.id) {
+        setRematchState("incoming");
+      }
+    };
+
+    const onRematchDeclined = () => {
+      console.log("REMATCH DECLINED RECEIVED");
+      setRematchState("declined");
+    };
+
+    const onRematchAccepted = ({ matchId: newId }) => {
+      console.log("REMATCH ACCEPTED RECEIVED", newId);
+      navigate(`/duel/${newId}`);
+    };
+
+    socket.on("rematch:requested", onRematchRequested);
+    socket.on("rematch:accepted", onRematchAccepted);
+    socket.on("rematch:declined", onRematchDeclined);
+
+    return () => {
+      socket.off("rematch:requested", onRematchRequested);
+      socket.off("rematch:accepted", onRematchAccepted);
+      socket.off("rematch:declined", onRematchDeclined);
+    };
+  }, [session, navigate]);
 
   if (failed) {
     navigate("/dashboard");
@@ -179,9 +243,33 @@ export default function Result() {
         )}
 
         <div className="flex gap-2 flex-wrap">
-          <Button variant="secondary" disabled title="Wired on Day 11">
-            Rematch
-          </Button>
+          {rematchState === "idle" && (
+            <Button variant="secondary" onClick={requestRematch}>
+              Rematch
+            </Button>
+          )}
+
+          {rematchState === "requested" && (
+            <Button variant="secondary" disabled>
+              Waiting for opponent...
+            </Button>
+          )}
+
+          {rematchState === "declined" && (
+            <Button variant="secondary" disabled>
+              Declined
+            </Button>
+          )}
+
+          {rematchState === "incoming" && (
+            <div className="flex gap-2">
+              <Button onClick={acceptRematch}>Accept Rematch</Button>
+
+              <Button variant="secondary" onClick={declineRematch}>
+                Decline
+              </Button>
+            </div>
+          )}
 
           <Button
             onClick={async () => {

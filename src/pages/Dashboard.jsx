@@ -7,6 +7,7 @@ import Card from "../components/ui/Card";
 import Chip from "../components/ui/Chip";
 import RankBadge from "../components/ui/RankBadge";
 import { Trophy, Skull, Minus, ChevronRight } from "lucide-react";
+import Avatar from "../components/ui/Avatar";
 
 export default function Dashboard() {
   const { session } = useAuth();
@@ -133,9 +134,7 @@ export default function Dashboard() {
                     className="relative"
                     title={f.username}
                   >
-                    <div className="w-10 h-10 rounded bg-base-800 flex items-center justify-center font-display font-bold text-sm">
-                      {f.username[0].toUpperCase()}
-                    </div>
+                    <Avatar seed={f.username} size={40} className="rounded" />
                     <span
                       className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-base-900 ${f.online ? "bg-verdict-pass" : "bg-ink-400"}`}
                     />

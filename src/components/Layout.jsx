@@ -8,6 +8,7 @@ import {
   History,
   ChevronDown,
   LogOut,
+  Code2,
   History as HistoryIcon,
 } from "lucide-react";
 import Button from "./ui/Button";
@@ -66,6 +67,14 @@ export default function Layout({ children }) {
         >
           <Users size={16} />
           Friends
+        </Link>
+
+        <Link
+          to="/problems"
+          className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-base-800 text-sm text-ink-100 transition-colors"
+        >
+          <Code2 size={16} />
+          Problems
         </Link>
 
         <Link

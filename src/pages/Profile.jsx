@@ -5,6 +5,7 @@ import Card from "../components/ui/Card";
 import Chip from "../components/ui/Chip";
 import RankBadge from "../components/ui/RankBadge";
 import { Trophy, Skull, Minus } from "lucide-react";
+import Avatar from "../components/ui/Avatar";
 
 export default function Profile() {
   const { identifier = "me" } = useParams();
@@ -36,9 +37,7 @@ export default function Profile() {
   return (
     <div className="max-w-2xl mx-auto p-6 flex flex-col gap-6">
       <div className="flex items-center gap-4">
-        <div className="w-16 h-16 rounded-full bg-base-800 flex items-center justify-center font-display text-2xl">
-          {data.username[0].toUpperCase()}
-        </div>
+        <Avatar seed={data.username} size={64} className="rounded-full" />
         <div>
           <h1 className="font-display text-2xl font-bold">
             {data.username}

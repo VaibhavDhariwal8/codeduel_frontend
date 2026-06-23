@@ -6,6 +6,7 @@ import { Radar, Check } from "lucide-react";
 import { useEscToClose } from "../lib/useEscToClose";
 import Button from "./ui/Button";
 import Card from "./ui/Card";
+import Avatar from "./ui/Avatar";
 
 function MatchFoundCeremony({ opponent, session, onComplete }) {
   const [step, setStep] = useState("slide");
@@ -52,7 +53,11 @@ function MatchFoundCeremony({ opponent, session, onComplete }) {
                 }
           }
         >
-          {me?.username?.[0]?.toUpperCase() || "?"}
+          <Avatar
+            seed={me?.username || "you"}
+            size={56}
+            className="rounded-full"
+          />
         </div>
         <span
           className={`font-display text-2xl font-bold text-brand-400 transition-opacity duration-200 ${step === "slide" ? "opacity-0" : "opacity-100"}`}
@@ -70,7 +75,11 @@ function MatchFoundCeremony({ opponent, session, onComplete }) {
                 }
           }
         >
-          {opponent?.username?.[0]?.toUpperCase() || "?"}
+          <Avatar
+            seed={opponent?.username || "opponent"}
+            size={56}
+            className="rounded-full"
+          />
         </div>
       </div>
       <div className="h-16 flex items-center">

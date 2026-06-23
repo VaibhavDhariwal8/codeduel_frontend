@@ -5,6 +5,8 @@ import { getSocket } from "../lib/socket";
 import Editor from "@monaco-editor/react";
 import { Check, X } from "lucide-react";
 
+import Avatar from "../components/ui/Avatar";
+
 import Button from "../components/ui/Button";
 import Chip from "../components/ui/Chip";
 
@@ -480,8 +482,13 @@ export default function DuelArena() {
               </>
             ) : (
               <div className="bg-base-950 border border-base-700 rounded p-3 flex flex-col items-center gap-2">
-                <div className="w-12 h-12 rounded-full bg-base-800 flex items-center justify-center font-display text-lg">
-                  ?
+                <div className="flex items-center gap-2 mb-3">
+                  <Avatar
+                    seed={data.opponentUsername}
+                    size={32}
+                    className="rounded"
+                  />
+                  <span className="text-sm">{data.opponentUsername}</span>
                 </div>
 
                 <p className="text-sm text-ink-400 text-center">

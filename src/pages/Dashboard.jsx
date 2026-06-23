@@ -34,8 +34,6 @@ export default function Dashboard() {
     const socket = getSocket(session.access_token);
 
     const onChange = ({ userId, online }) => {
-      console.log("presence changed", userId, online);
-
       setFriends((prev) =>
         prev?.map((f) => (f.friend_id === userId ? { ...f, online } : f)),
       );

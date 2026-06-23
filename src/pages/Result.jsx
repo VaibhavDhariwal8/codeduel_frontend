@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/AuthContext";
 import Button from "../components/ui/Button";
 import { getSocket } from "../lib/socket";
+import AutopsyPanel from "../components/AutopsyPanel";
 
 function AnimatedDelta({ delta }) {
   const [display, setDisplay] = useState(0);
@@ -42,6 +43,23 @@ export default function Result() {
   const [reportDetails, setReportDetails] = useState("");
   const [reporting, setReporting] = useState(false);
   const [rematchState, setRematchState] = useState("idle");
+
+  const [autopsy, setAutopsy] = useState(null);
+  const [autopsyLoading, setAutopsyLoading] = useState(false);
+
+  function loadAutopsy() {
+    if (autopsy) return;
+    setAutopsyLoading(true);
+    fetch(
+      `${import.meta.env.VITE_BACKEND_URL}/api/matches/${matchId}/autopsy`,
+      { headers: { Authorization: `Bearer ${session.access_token}` } },
+    )
+      .then((r) => r.json())
+      .then((d) => {
+        setAutopsy(d);
+        setAutopsyLoading(false);
+      });
+  }
 
   async function submitReport() {
     try {
@@ -210,17 +228,22 @@ export default function Result() {
         </div>
 
         <div className="flex gap-2 border-b border-base-700">
-          {["summary", "yours", "opponent"].map((t) => (
+          {["summary", "yours", "opponent", "coach"].map((t) => (
             <button
               key={t}
-              onClick={() => setTab(t)}
+              onClick={() => {
+                setTab(t);
+                if (t === "coach") loadAutopsy();
+              }}
               className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px ${tab === t ? "border-brand-500 text-ink-100" : "border-transparent text-ink-400"}`}
             >
               {t === "summary"
                 ? "Summary"
                 : t === "yours"
                   ? "Your Code"
-                  : "Opponent's Code"}
+                  : t === "opponent"
+                    ? "Opponent's Code"
+                    : "AI Coach"}
             </button>
           ))}
         </div>
@@ -241,6 +264,14 @@ export default function Result() {
             {data.opponent.submission?.code || "No submission."}
           </pre>
         )}
+        {tab === "coach" &&
+          (autopsyLoading || !autopsy ? (
+            <p className="text-ink-400 text-sm">Reviewing your approach…</p>
+          ) : autopsy.unavailable ? (
+            <p className="text-ink-400 text-sm">{autopsy.reason}</p>
+          ) : (
+            <AutopsyPanel autopsy={autopsy} />
+          ))}
 
         <div className="flex gap-2 flex-wrap">
           {rematchState === "idle" && (

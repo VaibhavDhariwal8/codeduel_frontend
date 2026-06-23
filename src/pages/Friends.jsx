@@ -85,147 +85,169 @@ export default function Friends() {
   );
 
   return (
-    <div className="max-w-2xl mx-auto p-6 flex flex-col gap-6">
-      <h1 className="font-display text-2xl font-bold">Friends</h1>
-      {me && (
-        <Card className="p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar seed={me.username} size={40} className="rounded" />
-
-            <div>
-              <p className="font-medium">{me.username}</p>
-              <p className="text-xs text-ink-400">Your Rating</p>
-            </div>
-          </div>
-
-          <span className="font-display text-lg text-brand-400">
-            {me.rating}
-          </span>
-        </Card>
-      )}
-      <Card className="p-4">
-        <form onSubmit={sendRequest} className="flex gap-2">
-          <input
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Username"
-            className="flex-1 bg-base-800 border border-base-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50"
-          />
-          <Button type="submit" className="flex items-center gap-1">
-            <UserPlus size={14} /> Add
-          </Button>
-        </form>
-        {error && <p className="text-verdict-fail text-sm mt-2">{error}</p>}
-      </Card>
-      {incoming.length > 0 && (
-        <div>
-          <p className="text-xs text-ink-400 uppercase mb-2">
-            Incoming requests
-          </p>
-          {incoming.map((f) => (
-            <Card
-              key={f.id}
-              className="p-3 flex items-center justify-between mb-2"
-            >
-              <div className="flex items-center gap-3">
-                <Avatar seed={f.other_username} size={32} className="rounded" />
-                <span>{f.other_username}</span>
+    <div className="max-w-[1120px] mx-auto p-8">
+      <h1 className="font-display text-2xl font-bold mb-6">Friends</h1>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-5 flex flex-col gap-6">
+          {me && (
+            <Card className="p-4 flex items-center gap-3">
+              <Avatar seed={me.username} size={40} className="rounded" />
+              <div>
+                <p className="font-medium text-sm">{me.username}</p>
+                <p className="text-xs text-ink-400">Your Rating</p>
               </div>
-              <div className="flex gap-2">
-                <Button
-                  className="!p-2"
-                  onClick={() => respond(f.id, "accept")}
-                >
-                  <Check size={14} />
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="!p-2"
-                  onClick={() => respond(f.id, "decline")}
-                >
-                  <X size={14} />
-                </Button>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-      {outgoing.length > 0 && (
-        <div>
-          <p className="text-xs text-ink-400 uppercase mb-2">Pending (sent)</p>
-          {outgoing.map((f) => (
-            <Card
-              key={f.id}
-              className="p-3 flex items-center justify-between mb-2 text-ink-400"
-            >
-              <div className="flex items-center gap-3">
-                <Avatar seed={f.other_username} size={32} className="rounded" />
-                <span>{f.other_username}</span>
-              </div>
-              <span className="text-xs">waiting...</span>
-            </Card>
-          ))}
-        </div>
-      )}
-
-      <div className="flex flex-col gap-3">
-        <h2 className="font-display text-lg">Friend Rankings</h2>
-
-        <div className="bg-base-900 border border-base-700 rounded-lg divide-y divide-base-700">
-          {rankedFriends.map((f, i) => (
-            <div
-              key={f.id}
-              className="flex items-center justify-between px-4 py-3"
-            >
-              <div className="flex items-center gap-3">
-                <span className="w-6 text-center font-display text-brand-400">
-                  #{i + 1}
-                </span>
-
-                <Avatar seed={f.other_username} size={32} className="rounded" />
-
-                <span>{f.other_username}</span>
-              </div>
-
-              <span
-                className={`font-mono text-sm ${
-                  f.other_rating >= 1400
-                    ? "text-brand-400"
-                    : f.other_rating >= 1200
-                      ? "text-verdict-pass"
-                      : "text-ink-300"
-                }`}
-              >
-                {f.other_rating}
+              <span className="ml-auto font-mono text-brand-400 text-lg">
+                {me.rating}
               </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <p className="text-xs text-ink-400 uppercase mb-2">Friends</p>
-        {accepted.length === 0 && (
-          <p className="text-ink-400 text-sm">No friends yet.</p>
-        )}
-        {accepted.map((f) => (
-          <Card
-            key={f.id}
-            className="p-3 flex items-center justify-between mb-2"
-          >
-            <div className="flex items-center gap-3">
-              <Avatar seed={f.other_username} size={32} className="rounded" />
-              <span>{f.other_username}</span>
-            </div>
-            <Button
-              variant="secondary"
-              className="!p-2"
-              onClick={() => remove(f.other_user_id)}
-            >
-              <UserMinus size={14} />
-            </Button>
+            </Card>
+          )}
+          <Card className="p-4">
+            <p className="text-xs text-ink-400 uppercase mb-3">
+              Friend Rankings
+            </p>
+            {ranked.length === 0 ? (
+              <p className="text-ink-400 text-sm">
+                Add friends to see rankings.
+              </p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {ranked.map((u, i) => (
+                  <div
+                    key={u.username}
+                    className={`flex items-center justify-between p-2 rounded-md ${u.isMe ? "bg-brand-500/10 border border-brand-500/30" : ""}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs text-ink-400 w-4 text-center">
+                        {i + 1}
+                      </span>
+                      <Avatar seed={u.username} size={28} className="rounded" />
+                      <span className="text-sm">
+                        {u.username}
+                        {u.isMe && <span className="text-ink-400"> (you)</span>}
+                      </span>
+                    </div>
+                    <RankBadge rating={u.rating} showRating={false} />
+                  </div>
+                ))}
+              </div>
+            )}
           </Card>
-        ))}
+        </div>
+
+        <div className="lg:col-span-7 flex flex-col gap-6">
+          <Card className="p-4">
+            <form onSubmit={sendRequest} className="flex gap-2">
+              <input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Username"
+                className="flex-1 bg-base-800 border border-base-700 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50"
+              />
+              <Button type="submit" className="flex items-center gap-1">
+                <UserPlus size={14} /> Add
+              </Button>
+            </form>
+            {error && <p className="text-verdict-fail text-sm mt-2">{error}</p>}
+          </Card>
+
+          {incoming.length > 0 && (
+            <div>
+              <p className="text-xs text-ink-400 uppercase mb-2">
+                Incoming requests
+              </p>
+              <div className="flex flex-col gap-2">
+                {incoming.map((f) => (
+                  <Card
+                    key={f.id}
+                    className="p-3 flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Avatar
+                        seed={f.other_username}
+                        size={32}
+                        className="rounded"
+                      />
+                      <span>{f.other_username}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        className="!p-2"
+                        onClick={() => respond(f.id, "accept")}
+                      >
+                        <Check size={14} />
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        className="!p-2"
+                        onClick={() => respond(f.id, "decline")}
+                      >
+                        <X size={14} />
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {outgoing.length > 0 && (
+            <div>
+              <p className="text-xs text-ink-400 uppercase mb-2">
+                Pending (sent)
+              </p>
+              <div className="flex flex-col gap-2">
+                {outgoing.map((f) => (
+                  <Card
+                    key={f.id}
+                    className="p-3 flex items-center justify-between text-ink-400"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Avatar
+                        seed={f.other_username}
+                        size={32}
+                        className="rounded"
+                      />
+                      <span>{f.other_username}</span>
+                    </div>
+                    <span className="text-xs">waiting...</span>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <p className="text-xs text-ink-400 uppercase mb-2">Friends</p>
+            {accepted.length === 0 ? (
+              <p className="text-ink-400 text-sm">No friends yet.</p>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {accepted.map((f) => (
+                  <Card
+                    key={f.id}
+                    className="p-3 flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Avatar
+                        seed={f.other_username}
+                        size={32}
+                        className="rounded"
+                      />
+                      <span>{f.other_username}</span>
+                    </div>
+                    <Button
+                      variant="secondary"
+                      className="!p-2"
+                      onClick={() => remove(f.other_user_id)}
+                    >
+                      <UserMinus size={14} />
+                    </Button>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

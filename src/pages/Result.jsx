@@ -4,6 +4,7 @@ import { useAuth } from "../lib/AuthContext";
 import Button from "../components/ui/Button";
 import { getSocket } from "../lib/socket";
 import AutopsyPanel from "../components/AutopsyPanel";
+import { useEscToClose } from "../lib/useEscToClose";
 
 function AnimatedDelta({ delta }) {
   const [display, setDisplay] = useState(0);
@@ -46,6 +47,13 @@ export default function Result() {
 
   const [autopsy, setAutopsy] = useState(null);
   const [autopsyLoading, setAutopsyLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEscToClose(showReport, () => setShowReport(false));
+
+  const reduced =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   function loadAutopsy() {
     if (autopsy) return;
@@ -165,6 +173,12 @@ export default function Result() {
     };
   }, [session, navigate]);
 
+  useEffect(() => {
+    if (data) {
+      requestAnimationFrame(() => setMounted(true));
+    }
+  }, [data]);
+
   if (failed) {
     navigate("/dashboard");
     return null;
@@ -199,7 +213,19 @@ export default function Result() {
       >
         {banner.text}
       </div>
-      <div className="bg-base-900 border border-base-700 rounded-lg w-full max-w-2xl p-6 flex flex-col gap-6">
+      <div
+        className="bg-base-900 border border-base-700 rounded-lg w-full max-w-2xl p-6 flex flex-col gap-6 transition-all duration-300 ease-out"
+        style={
+          reduced
+            ? {
+                opacity: mounted ? 1 : 0,
+              }
+            : {
+                transform: mounted ? "translateY(0)" : "translateY(24px)",
+                opacity: mounted ? 1 : 0,
+              }
+        }
+      >
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
             <p className="text-xs text-ink-400 uppercase mb-1">Time Taken</p>

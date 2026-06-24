@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../lib/AuthContext";
 import { getSocket } from "../lib/socket";
 
@@ -9,11 +9,24 @@ import RankBadge from "../components/ui/RankBadge";
 import { Trophy, Skull, Minus, ChevronRight } from "lucide-react";
 import Avatar from "../components/ui/Avatar";
 
+const navigate = useNavigate();
+
 export default function Dashboard() {
   const { session } = useAuth();
   const [profile, setProfile] = useState(null);
   const [history, setHistory] = useState(null);
   const [friends, setFriends] = useState(null);
+  const [inviteState, setInviteState] = useState("idle");
+  const [inviteDifficulty, setInviteDifficulty] = useState("any");
+  const [inviteLink, setInviteLink] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const socket = getSocket(session.access_token);
+    const onAccepted = ({ matchId }) => navigate(`/duel/${matchId}`);
+    socket.on("invite:accepted", onAccepted);
+    return () => socket.off("invite:accepted", onAccepted);
+  }, [session, navigate]);
 
   useEffect(() => {
     const headers = { Authorization: `Bearer ${session.access_token}` };
@@ -47,6 +60,32 @@ export default function Dashboard() {
     };
   }, [session, friends]);
 
+  async function createInvite() {
+    setInviteState("creating");
+
+    const r = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/invites`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({
+        difficulty: inviteDifficulty,
+      }),
+    });
+
+    const { token } = await r.json();
+
+    setInviteLink(`${window.location.origin}/invite/${token}`);
+    setInviteState("created");
+  }
+
+  function copyLink() {
+    navigator.clipboard.writeText(inviteLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
+
   if (!profile || !history || !friends)
     return <div className="p-8 text-ink-400">Loading dashboard…</div>;
 
@@ -78,17 +117,50 @@ export default function Dashboard() {
             <h3 className="font-display text-xl font-semibold mb-2">
               Custom Duel
             </h3>
-            <p className="text-ink-400 text-sm mb-6">
-              Invite a specific friend to a private arena via link or username
-              search.
+            <p className="text-ink-400 text-sm mb-4">
+              Generate a link — first person to open and accept it duels you.
             </p>
-            <button
-              disabled
-              className="w-full border border-base-700 text-ink-400 py-2.5 rounded-md text-sm font-medium cursor-not-allowed"
-              title="Not built in this demo"
-            >
-              Create Invite Link
-            </button>
+            {inviteState === "idle" && (
+              <div className="flex gap-2">
+                <select
+                  value={inviteDifficulty}
+                  onChange={(e) => setInviteDifficulty(e.target.value)}
+                  className="flex-1 bg-base-800 border border-base-700 rounded-md px-2 py-2 text-sm"
+                >
+                  <option value="any">Any difficulty</option>
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+                <Button onClick={createInvite}>Create Link</Button>
+              </div>
+            )}
+            {inviteState === "creating" && (
+              <p className="text-ink-400 text-sm">Generating link…</p>
+            )}
+            {inviteState === "created" && (
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <input
+                    readOnly
+                    value={inviteLink}
+                    className="flex-1 bg-base-800 border border-base-700 rounded-md px-3 py-2 text-xs font-mono text-ink-400"
+                  />
+                  <Button variant="secondary" onClick={copyLink}>
+                    {copied ? "Copied!" : "Copy"}
+                  </Button>
+                </div>
+                <p className="text-xs text-ink-400">
+                  Waiting for someone to accept… (expires in 1 hour)
+                </p>
+                <button
+                  onClick={() => setInviteState("idle")}
+                  className="text-xs text-brand-400 underline self-start"
+                >
+                  Create another
+                </button>
+              </div>
+            )}
           </Card>
 
           <Card className="p-6 grid grid-cols-3 gap-4 divide-x divide-base-700">

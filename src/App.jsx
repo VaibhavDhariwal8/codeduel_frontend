@@ -22,6 +22,8 @@ import Friends from "./pages/Friends";
 import Profile from "./pages/Profile";
 import History from "./pages/History";
 
+import InviteAccept from "./pages/InviteAccept";
+
 function Root() {
   const { session, loading } = useAuth();
 
@@ -86,6 +88,15 @@ export default function App() {
                 <Layout>
                   <Friends />
                 </Layout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/invite/:token"
+            element={
+              <ProtectedRoute>
+                <InviteAccept />
               </ProtectedRoute>
             }
           />

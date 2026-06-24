@@ -23,6 +23,7 @@ import Profile from "./pages/Profile";
 import History from "./pages/History";
 
 import InviteAccept from "./pages/InviteAccept";
+import WalkthroughWidget from "./components/WalkthroughWidget";
 
 function Root() {
   const { session, loading } = useAuth();
@@ -36,6 +37,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <WalkthroughWidget />
         <Routes>
           <Route
             path="/duel/:matchId/result"

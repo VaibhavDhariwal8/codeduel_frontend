@@ -5,6 +5,7 @@ import { getSocket } from "../lib/socket";
 
 import Card from "../components/ui/Card";
 import Chip from "../components/ui/Chip";
+import Button from "../components/ui/Button";
 import RankBadge from "../components/ui/RankBadge";
 import { Trophy, Skull, Minus, ChevronRight } from "lucide-react";
 import Avatar from "../components/ui/Avatar";

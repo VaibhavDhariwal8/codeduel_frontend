@@ -12,6 +12,7 @@ import ProtectedRoute from "./lib/ProtectedRoute";
 import DuelArena from "./pages/DuelArena";
 import Dashboard from "./pages/Dashboard";
 
+import AdminReports from "./pages/AdminReports";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Problems from "./pages/Problems";
@@ -39,6 +40,15 @@ export default function App() {
       <BrowserRouter>
         <WalkthroughWidget />
         <Routes>
+          <Route
+            path="/admin/reports"
+            element={
+              <ProtectedRoute>
+                <AdminReports />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/duel/:matchId/result"
             element={

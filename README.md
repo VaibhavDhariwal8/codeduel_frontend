@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="/codeduel_frontend/src/assets/image.png" alt="CodeDuel Banner" width="70%" />
+<img width="1905" height="1038" alt="image" src="https://github.com/user-attachments/assets/ad13da84-860b-4dbc-8168-2afbe903bdb0" alt="CodeDuel Banner" width="70%" />
 
 <h1>CodeDuel</h1>
 
